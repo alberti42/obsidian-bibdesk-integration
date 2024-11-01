@@ -69,12 +69,12 @@ export function getFormattedJournalReference(bibEntry: BibTeXEntry, options: Jou
                 volume = bibEntry.fields.volume
             }    
         }
-        const page = bibEntry.fields.page ?? null;
-        const bothVolPage = [volume,page].filter((x)=>x!==null).join(',')
+        const pages = bibEntry.fields.pages ?? null;
+        const bothVolPage = [volume,pages].filter((x)=>x!==null).join(',')
         journal_vol_page = [journal,bothVolPage].filter((x)=>x!==null).join(' ');
     }
     
-    const year = bibEntry.fields.year ? `(${bibEntry.fields.year})` : null;
+    const year = options.includingYear ? (bibEntry.fields.year ? `(${bibEntry.fields.year})` : null) : null;
 
     const journalRef = [journal_vol_page,year].filter((x)=>x!==null).join(' ');
 

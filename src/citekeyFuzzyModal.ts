@@ -128,19 +128,7 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
 	}
 
 	getItemText(item: BibTeXEntry): string {
-        /*
-        let authors_str;
-        const len = item.authors.length;
-        if(len >= 2) {
-            authors_str = item.authors[0].lastName + ' ' + item.authors[len-1].lastName;
-        } else if(len == 1) {
-            authors_str = item.authors[0].lastName;
-        } else {
-            authors_str = '';
-        }
-        return [item.citekey,getTitle(item),authors_str].join(' ');
-        */
-		return [item.citekey,getFormattedTitle(item)].join(' ');
+        return [item.citekey,getFormattedTitle(item)].join(' ');
 	}
 
 	renderSuggestion(fuzzyMatch: FuzzyMatch<BibTeXEntry>, el: HTMLElement) {
@@ -160,7 +148,7 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
         const journalRefEl = document.createElement('div');
         journalRefEl.innerHTML = getFormattedJournalReference(fuzzyMatch.item, {includingYear:true, highlightVolume: HighlightType.HTML});
         journalRefEl.classList.add('bibtex-integration-jref');
-
+        
         const citekeyEl = document.createElement('div');
         citekeyEl.classList.add('bibtex-integration-citekey');
 
