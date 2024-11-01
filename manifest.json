@@ -1,6 +1,6 @@
 {
 	"id": "bibdesk-integration",
-	"name": "BibDesk integration",
+	"name": "BibDesk Integration",
 	"version": "1.0.0",
 	"minAppVersion": "1.5.0",
 	"description": "Allows using BibTex citations and opening attached PDFs from a BibDesk library.",
