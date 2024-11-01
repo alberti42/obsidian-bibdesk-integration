@@ -8,7 +8,7 @@ import { around } from 'monkey-around';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { BibtexIntegrationSettings } from 'types';
+import { BibtexIntegrationSettings, isHotkeysSettingTab } from 'types';
 import { unwatchFile, watchFile, doesFolderExist, joinPaths, set_bookmark_resolver_path, fileExists, parseFilePath } from 'utils';
 
 import { DEFAULT_BIBTEX_CONTENT, DEFAULT_SETTINGS } from 'defaults';
@@ -461,7 +461,24 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
                 });
         });
 
+        new Setting(containerEl).setName('Commands and hotkeys').setHeading();
 
+        new Setting(containerEl).setName(createFragment((frag:DocumentFragment) => {
+                frag.appendText("The plugin offers a range of commands to insert citations and open the attached PDF files. \
+                    You can review the commands and their hotkey assignments by visiting the ");
+                const em = createEl('em');
+                const link = frag.createEl('a', { href: '#', text: 'Hotkeys'});
+                link.onclick = () => {
+                    const tab = this.app.setting.openTabById('hotkeys');
+                    if(isHotkeysSettingTab(tab)) {
+                        tab.setQuery(this.plugin.manifest.id)
+                    }
+                };
+
+                em.appendChild(link);
+                frag.appendChild(em);
+                frag.appendText(' configuration pane.');
+            }));
 
     }
 

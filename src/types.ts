@@ -1,5 +1,7 @@
 // types.ts
 
+import { HotkeysSettingTab } from "obsidian";
+
 export interface Location {
     start: Position;
     end: Position;
@@ -130,3 +132,7 @@ export interface ParserOptions {
     debug_parser: boolean;
 }
 
+export function isHotkeysSettingTab(obj: unknown): obj is HotkeysSettingTab {
+    // Check if `obj` is an object and has the `setQuery` method
+    return typeof obj === 'object' && obj !== null && 'setQuery' in obj && typeof (obj as HotkeysSettingTab).setQuery === 'function';
+}

@@ -93,4 +93,8 @@ declare module "obsidian" {
         tabHeaderEl: HTMLElement;
         tabHeaderInnerTitleEl: HTMLElement;
     }
+
+    interface HotkeysSettingTab extends SettingTab {
+        setQuery: (str: string) => void;
+    }
 }
