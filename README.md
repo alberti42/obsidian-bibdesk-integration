@@ -1,53 +1,66 @@
-# Obsidian Bibdesk Integration
+# Obsidian BibDesk Integration
 
-⚠️ The plugin is able to parse BibTex files in general, but for the momement it has been specialized and tested for BibTex libraries created with BibDesk application for MacOS.
+⚠️ **Note:** This plugin supports general BibTeX parsing, but it’s optimized for libraries created with [BibDesk](https://en.wikipedia.org/wiki/BibDesk) on macOS.
 
-The plugin provides integration of the macOS [BibDesk](https://en.wikipedia.org/wiki/BibDesk) application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin for Obsidian. The plugin relies on a BibTex file for the paper library.
+This plugin integrates the macOS BibDesk application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin in Obsidian, enabling you to manage and open PDFs associated with BibDesk entries directly from Obsidian. It works with external BibTeX files, leveraging BibDesk’s `bdsk-file-<NUMBER>` fields, which act as macOS bookmarks, allowing seamless file access even if files are renamed or moved.
 
-The plugin is able to parse the `bdsk-file-<NUMBER>` fields created by BibDesks in the BibTex library. The strength of BibDesks `bdsk-file-<NUMBER>` links is that they are macOS bookmarks that will resolve to the correct file even if the file is later renamed or moved.
+### Features
+- **External Library Support**: Your BibDesk library does not need to reside within your Obsidian vault, making it ideal for large libraries (several GBs).
+- **Optimized BibTeX Parser**: A custom BibTeX parser, faster than alternatives available for TypeScript and even BibDesk's own parser. Parsing occurs on a separate thread, ensuring minimal latency for Obsidian.
+- **Integration with PDF++**: Opens PDFs stored outside your Obsidian vault via the PDF++ plugin.
 
-The plugin supports external BibDesk libraries. It relies on PDF++ to open the attached PDF as files external to Obsidian vault.
+### Screenshots
+**Configuration Pane**  
+![Configuration Pane](docs/images/setting_screenshot.jpg)
 
-The plugin does not require the paper library to be stored in the vault. This is especially important for those who have a large paper library of several GB and do not intend to use space in Obsidian's vault.
+**Fuzzy Search Modal for Paper Selection**  
+![Fuzzy Search](docs/images/suggestion_menu_screenshot.jpg)
 
-The plugin provides its own fast parser for BibTex files, which is faster than existing parsers available on the internet for TypeScript. It is also faster than BibDesk original parser. Importantly, BibTex files are parsed in a separate thread preventing latency when loading Obsidian.
-
-Below is a screenshot of the configuration pane:
-
-![setting_screenshot](docs/images/setting_screenshot.jpg)
-
-Below is a screenshot of the fuzzy search modal window to select a paper to open:
-
-![setting_screenshot](docs/images/suggestion_menu_screenshot.jpg)
-
-We suggest customizing the commands with the following hotkeys:
-
-![hot_keys](docs/images/recommended_hotkeys.jpg)
+**Recommended Hotkeys**  
+![Hotkeys](docs/images/recommended_hotkeys.jpg)
 
 ## Installation
 
-From command line:
+To install the plugin manually, follow these steps:
 
-1. Clone the repository to a local folder: `https://github.com/alberti42/obsidian-bibtex-integration.git`.
-2. Install the `node.js` packages: `npm install`
-3. Generate the parser for parsing BibTex files:  `npm run grammar`
-4. Using Swift compiler, build the utility resolving macOS bookmarks: `npm run bookmark_resolver`. This step requires you to have `swiftc` available from command line; see Apple Xcode instrutions how to make it available.
-5. Transpile the plugin: `npm run build`
-6. Check that in the subfolder `dist` the following files have been created: `styles.css
-bookmark_resolver`, `main.js`, `manifest.json`
-7. Create in your vault the folder for the plugin: `mkdir -p <REPLACE_WITH_YOUR_VAULT_FOLDER/.obsidian/plugins/bibtex-integration`
-8. Copy the files listed at point 6. to the folder created at point 7. Alterantively, create symbolic links (e.g., using `ln -s ...`) if you plan to fork the project and do further development, where you need to repeat the steps above often.
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/alberti42/obsidian-bibdesk-integration.git
+   ```
+2. **Install Node.js Packages**:
+   ```bash
+   npm install
+   ```
+3. **Generate the Parser for BibTeX Files**:
+   ```bash
+   npm run grammar
+   ```
+4. **Build the macOS Bookmark Resolver**:
+   ```bash
+   npm run bookmark_resolver
+   ```
+   > Ensure you have the `swiftc` compiler available via the command line. Refer to Xcode’s documentation if needed.
 
-## Donations
+5. **Transpile the Plugin**:
+   ```bash
+   npm run build
+   ```
+6. **Verify Output**: Ensure that the `dist` folder contains `styles.css`, `bookmark_resolver`, `main.js`, and `manifest.json`.
+7. **Copy or Link Plugin Files to Obsidian**:
+   - Create the plugin folder in your vault:
+     ```bash
+     mkdir -p <YOUR_VAULT_FOLDER>/.obsidian/plugins/bibdesk-integration
+     ```
+   - Copy or create symbolic links from the `dist` folder to the plugin folder created in step 7. This is helpful if you plan to further develop the plugin.
 
-I would be grateful for any donation to support the development of this plugin.
+## Support the Project
+If you find this plugin helpful, consider supporting its development:
 
 [<img src="docs/images/buy_me_coffee.png" width=300 alt="Buy Me a Coffee QR Code"/>](https://buymeacoffee.com/alberti)
 
-## Author
-
+## About the Author
 - **Author:** Andrea Alberti
-- **GitHub Profile:** [alberti42](https://github.com/alberti42)
+- **GitHub:** [alberti42](https://github.com/alberti42)
 - **Donations:** [![Buy Me a Coffee](https://img.shields.io/badge/Donate-Buy%20Me%20a%20Coffee-orange)](https://buymeacoffee.com/alberti)
 
-Feel free to contribute to the development of this plugin or report any issues in the [GitHub repository](https://github.com/alberti42/obsidian-plugins-annotations/issues).
+Please feel free to contribute or report any issues in the [GitHub repository](https://github.com/alberti42/obsidian-bibdesk-integration/issues).
