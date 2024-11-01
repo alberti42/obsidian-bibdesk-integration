@@ -1,19 +1,21 @@
 // defaults.ts
 
-import {BibtexIntegrationSettings, AuthorOptions, JournalReferenceOptions, HighlightType} from 'types'
+import {BibtexIntegrationSettings, AuthorFormatOptions, JournalReferenceOptions, HighlightType, FormatType} from 'types'
 
 export const DEFAULT_SETTINGS: BibtexIntegrationSettings = {
     bibtex_filepath: '',
-    import_delay_ms: 1000,
+    import_delay_ms: 750,
     debug_parser: false,
     pdf_folder: '/',
     use_demo_entries: true,
     organize_by_years: true,
 }
 
-export const AuthorOptionsDefault: AuthorOptions = {
-    shortList: false,
+export const AuthorOptionsDefault: AuthorFormatOptions = {
     onlyLastName: false,
+    includeEtAl: true,
+    precedeLastAuthorsByAnd: true,
+    formatType: FormatType.AllAuthors,
 }
 
 export const JournalReferenceOptionDefault: JournalReferenceOptions = {

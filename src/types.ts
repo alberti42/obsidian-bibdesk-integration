@@ -77,9 +77,18 @@ export interface Queries {
 
 /* Citation formats */
 
-export interface AuthorOptions {
-    shortList: boolean,
+export interface AuthorFormatOptions {
+    formatType: FormatType,
     onlyLastName: boolean,
+    includeEtAl: boolean,
+    precedeLastAuthorsByAnd: boolean,
+}
+
+export enum FormatType {
+    AllAuthors,
+    JustFirstAuthor,
+    JustLastAuthor,
+    FirstAndLastAuthor,
 }
 
 export enum HighlightType {

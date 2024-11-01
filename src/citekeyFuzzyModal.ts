@@ -4,7 +4,7 @@
 import { App, FuzzyMatch, FuzzySuggestModal, MarkdownView, normalizePath, Notice, Platform, TFile } from 'obsidian';
 
 import BibtexIntegration from 'main';
-import { BibTeXEntry, HighlightType, ParsedPathWithIndex } from 'types';
+import { BibTeXEntry, FormatType, HighlightType, ParsedPathWithIndex } from 'types';
 import { createFolderIfNotExists, joinPaths, parseFilePath, resolveBookmark } from 'utils';
 import { BibtexManager, getBibDeskUriLink, getFormattedAuthors, getFormattedJournalReference, getFormattedTitle } from 'bibtex_manager';
 
@@ -128,7 +128,12 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
 	}
 
 	getItemText(item: BibTeXEntry): string {
-        return [item.citekey,getFormattedTitle(item)].join(' ');
+        return [item.citekey,getFormattedAuthors(item, {
+            formatType: FormatType.FirstAndLastAuthor,
+            precedeLastAuthorsByAnd:false,
+            onlyLastName:true,
+            includeEtAl:false,
+        }).join(' '),getFormattedTitle(item)].join(' ');
 	}
 
 	renderSuggestion(fuzzyMatch: FuzzyMatch<BibTeXEntry>, el: HTMLElement) {
@@ -138,7 +143,12 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
 		suggestionContainer.classList.add('bibtex-integration-suggestions');
 
         const authorsEl = document.createElement('div');
-        authorsEl.innerText = getFormattedAuthors(fuzzyMatch.item, {shortList:true, onlyLastName:true});
+        authorsEl.innerText = getFormattedAuthors(fuzzyMatch.item, {
+            formatType:FormatType.JustFirstAuthor,
+            precedeLastAuthorsByAnd:true,
+            onlyLastName:true,
+            includeEtAl:true
+        }).join(', ');
         authorsEl.classList.add('bibtex-integration-authors');
 		
 		const titleEl = document.createElement('div');
@@ -274,7 +284,12 @@ export class InsertCitationFuzzyModal extends BibEntriesFuzzyModal {
     }
     
     insertCitation(bibEntry:BibTeXEntry,shortCitation:boolean,addBibDeskUri:boolean) {
-        const authors = getFormattedAuthors(bibEntry, {shortList:shortCitation, onlyLastName:false});
+        const authors = getFormattedAuthors(bibEntry, {
+            formatType:shortCitation ? FormatType.JustFirstAuthor : FormatType.AllAuthors,
+            precedeLastAuthorsByAnd:true,
+            onlyLastName:false,
+            includeEtAl:true
+        }).join(', ');
         const journalRef = getFormattedJournalReference(bibEntry, {includingYear:true, highlightVolume: HighlightType.MarkDown});
         const title = getFormattedTitle(bibEntry);
         

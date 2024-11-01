@@ -1,6 +1,6 @@
 // bibtex_manager.ts
 
-import { AuthorOptions, BibTeXDict, BibTeXEntry, HighlightType, JournalReferenceOptions, ParsedAuthor, ParserOptions, ParserWorkerInput, ParserWorkerOutput, Queries } from "types";
+import { AuthorFormatOptions, BibTeXDict, BibTeXEntry, FormatType, HighlightType, JournalReferenceOptions, ParsedAuthor, ParserOptions, ParserWorkerInput, ParserWorkerOutput, Queries } from "types";
 import { parseUri, posixToFileURL, resolveBookmark } from "utils"
 import { AuthorOptionsDefault, JournalReferenceOptionDefault } from "defaults"
 import BibtexIntegration from "main";
@@ -81,30 +81,59 @@ export function getFormattedJournalReference(bibEntry: BibTeXEntry, options: Jou
     return journalRef;
 }
 
-export function getFormattedAuthors(bibEntry: BibTeXEntry, options: AuthorOptions = AuthorOptionsDefault):string {
+export function getFormattedAuthors(bibEntry: BibTeXEntry, options: AuthorFormatOptions = AuthorOptionsDefault):string[] {
+
+    const etAl = 'et al.';
 
     const authors = bibEntry.authors;
 
-    if(authors === undefined) return "";
+    if(authors === undefined || authors.length === 0) return [];
 
-    const formattedAuthors = authors.map((author:ParsedAuthor):string => {
+    const format_author = (author:ParsedAuthor):string => {
         if(options.onlyLastName) {
             return author.last;
         } else {
-            return `${author.first} ${author.last}`; // Format: "Initials LastName"    
+            return author.first + ' ' + author.last; // Format: "Initials LastName"    
         }   
-    });
+    };
 
-    if (options.shortList && formattedAuthors.length > 2) {
-        return `${formattedAuthors[0]} et al.`;
-    } else {
-        // Handle the case where there is more than one author
-        if (formattedAuthors.length > 1) {
-            const lastAuthor = formattedAuthors.pop(); // Remove the last author from the array
-            return `${formattedAuthors.join(', ')} and ${lastAuthor}`; // Join the others with commas, add "and" before the last author
+    let formattedAuthors:string[];
+    let lastAuthor:string;
+
+    switch(options.formatType) {
+
+    case FormatType.AllAuthors:
+        formattedAuthors = authors.map(format_author);
+
+        if(authors.length>1 && options.precedeLastAuthorsByAnd) {
+            lastAuthor = formattedAuthors.pop() ?? ""; // Remove the last author from the array
+            formattedAuthors.push(`and ${lastAuthor}`); // Join the others with commas, add "and" before the last author
         }
-        return formattedAuthors.join('');    
-    }   
+        
+        return formattedAuthors;
+
+    case FormatType.FirstAndLastAuthor:
+        if(authors.length>1) {
+            if(options.includeEtAl) {
+                return [format_author(authors[0]),etAl,format_author(authors[authors.length-1])];
+            } else {
+                return [format_author(authors[0]),format_author(authors[authors.length-1])];
+            }
+            
+        } else {
+            return [format_author(authors[0])];
+        }
+
+    case FormatType.JustFirstAuthor:
+        if(authors.length>1 && options.includeEtAl) {
+            return [format_author(authors[0]), etAl];
+        } else {
+            return [format_author(authors[0])];
+        }
+        
+    case FormatType.JustLastAuthor:
+        return [format_author(authors[authors.length-1])]
+    } 
 }
 
 export function getFormattedTitle(bibEntry: BibTeXEntry) {
