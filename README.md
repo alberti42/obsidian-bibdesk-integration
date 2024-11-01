@@ -1,14 +1,28 @@
 # Obsidian Bibdesk Integration
 
-The plugin provides integration of the macOS [BibDesk](https://en.wikipedia.org/wiki/BibDesk) application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin for Obsidian. The plugin relies on a BibTex file for the paper library. 
+⚠️ The plugin is able to parse BibTex files in general, but for the momement it has been specialized and tested for BibTex libraries created with BibDesk application for MacOS.
 
-The plugin is able to parse the `bdsk-file-XYZ` fields created by BibDesks in the BibTex library. The strength of BibDesks `bdsk-file-XYZ` links is that they are macOS bookmarks that will resolve to the correct file even if the file is later renamed or moved.
+The plugin provides integration of the macOS [BibDesk](https://en.wikipedia.org/wiki/BibDesk) application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin for Obsidian. The plugin relies on a BibTex file for the paper library.
+
+The plugin is able to parse the `bdsk-file-<NUMBER>` fields created by BibDesks in the BibTex library. The strength of BibDesks `bdsk-file-<NUMBER>` links is that they are macOS bookmarks that will resolve to the correct file even if the file is later renamed or moved.
+
+The plugin supports external BibDesk libraries. It relies on PDF++ to open the attached PDF as files external to Obsidian vault.
 
 The plugin does not require the paper library to be stored in the vault. This is especially important for those who have a large paper library of several GB and do not intend to use space in Obsidian's vault.
 
+The plugin provides its own fast parser for BibTex files, which is faster than existing parsers available on the internet for TypeScript. It is also faster than BibDesk original parser. Importantly, BibTex files are parsed in a separate thread preventing latency when loading Obsidian.
+
+Below is a screenshot of the configuration pane:
+
 ![setting_screenshot](docs/images/setting_screenshot.jpg)
 
+Below is a screenshot of the fuzzy search modal window to select a paper to open:
+
 ![setting_screenshot](docs/images/suggestion_menu_screenshot.jpg)
+
+We suggest customizing the commands with the following hotkeys:
+
+![hot_keys](docs/images/recommended_hotkeys.jpg)
 
 ## Installation
 
