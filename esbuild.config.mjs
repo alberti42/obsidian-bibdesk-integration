@@ -51,11 +51,15 @@ const buildMain = async () => {
             "original-fs",  // Mark original-fs as external so it's not bundled
             ...builtins
         ],
-        format: "cjs", // Maintain cjs format for Obsidian compatibility
-        target: "es2018",
+        format: "cjs",
+        target: "es2022",
         logLevel: "info",
         sourcemap: prod ? false : "inline",
-        treeShaking: true,
+        minify: prod,
+        minifySyntax: prod, // Enable syntax minification in production
+        minifyWhitespace: prod, // Disable whitespace minification
+        minifyIdentifiers: prod, // Disable identifier minification
+        treeShaking: prod,
         outdir,
         plugins: [
             inline_web_workers(
