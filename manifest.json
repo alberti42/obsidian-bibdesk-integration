@@ -1,9 +1,9 @@
 {
-	"id": "bibtex-integration",
-	"name": "Bibtex integration",
+	"id": "bibdesk-integration",
+	"name": "BibDesk integration",
 	"version": "1.0.0",
 	"minAppVersion": "1.5.0",
-	"description": "Allows importing bibtex entries.",
+	"description": "Allows using BibTex citations and opening attached PDFs from a BibDesk library.",
 	"author": "Andrea Alberti",
 	"authorUrl": "https://www.linkedin.com/in/dr-andrea-alberti/",
 	"fundingUrl": "https://buymeacoffee.com/alberti",

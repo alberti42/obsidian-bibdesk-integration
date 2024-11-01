@@ -1,7 +1,7 @@
 {
-    "name": "bibtex-integration",
+    "name": "bibdesk-integration",
     "version": "1.0.0",
-    "description": "Allows importing bibtex entries.",
+    "description": "Allows using BibTex citations and opening attached PDFs from a BibDesk library.",
     "main": "main.js",
     "scripts": {
         "dev": "node esbuild.config.mjs",
