@@ -1,44 +1,48 @@
 /* styles.css */
 
-.bibtex-integration {
+.bibdesk-integration {
 	width: 100%;
 }
 
-.bibtex-integration .suggestion-item div {
+.bibdesk-integration .suggestion-item div {
 	font-family: monospace;
 	font-size: var(--font-small);
 }
 
-.bibtex-integration-suggestions {
-    display: flex;
-    justify-content: space-between; /* Distribute space between items */
-    align-items: center; /* Align items vertically */
-    padding: var(--size-4-1) var(--size-4-2);
-    margin-bottom: var(--size-4-1);
-    gap: var(--size-4-3); /* Add space between columns */
+.bibdesk-integration-suggestions {
+	display: flex;
+	justify-content: space-between; /* Distribute space between items */
+	align-items: center; /* Align items vertically */
+	padding: var(--size-4-1) var(--size-4-2);
+	margin-bottom: var(--size-4-1);
+	gap: var(--size-4-3); /* Add space between columns */
 }
 
-.bibtex-integration-suggestions div {
-    white-space: nowrap;
+.bibdesk-integration-suggestions div {
+	white-space: nowrap;
 	overflow: hidden;
-    text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 
-.bibtex-integration-authors {
-    flex: 0 0 15%;
+.bibdesk-integration-authors {
+	flex: 0 0 15%;
 }
 
-.bibtex-integration-title {
-    flex: 0 0 50%;
-    font-weight: var(--font-semibold);
+.bibdesk-integration-title {
+	flex: 0 0 50%;
+	font-weight: var(--font-semibold);
 }
 
-.bibtex-integration-jref {
-    flex: 1 1 auto;
-    text-align: left;
+.bibdesk-integration-jref {
+	flex: 1 1 auto;
+	text-align: left;
 }
 
-.bibtex-integration-citekey {
-    flex: 1 0 10ch;
-    text-align: right;
+.bibdesk-integration-citekey {
+	flex: 1 0 10ch;
+	text-align: right;
+}
+
+.bibdesk-integration-hidden {
+  display: none;
 }

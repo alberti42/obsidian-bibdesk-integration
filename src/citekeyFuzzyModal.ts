@@ -103,7 +103,7 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
 		super.onOpen();
 		this.inputEl.focus();
 		this.containerEl.addEventListener('keydown', this.handleKeyDown);
-		this.modalEl.classList.add('bibtex-integration');
+		this.modalEl.classList.add('bibdesk-integration');
 
         // Use the last query
         this.inputEl.value = lastQuery;
@@ -140,7 +140,7 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
 		el.empty(); // Clear the existing content
 
 		const suggestionContainer = document.createElement('div');
-		suggestionContainer.classList.add('bibtex-integration-suggestions');
+		suggestionContainer.classList.add('bibdesk-integration-suggestions');
 
         const authorsEl = document.createElement('div');
         authorsEl.innerText = getFormattedAuthors(fuzzyMatch.item, {
@@ -149,18 +149,18 @@ abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
             onlyLastName:true,
             includeEtAl:true
         }).join(', ');
-        authorsEl.classList.add('bibtex-integration-authors');
+        authorsEl.classList.add('bibdesk-integration-authors');
 		
 		const titleEl = document.createElement('div');
         titleEl.innerText = getFormattedTitle(fuzzyMatch.item);
-        titleEl.classList.add('bibtex-integration-title');
+        titleEl.classList.add('bibdesk-integration-title');
 
         const journalRefEl = document.createElement('div');
-        journalRefEl.innerHTML = getFormattedJournalReference(fuzzyMatch.item, {includingYear:true, highlightVolume: HighlightType.HTML});
-        journalRefEl.classList.add('bibtex-integration-jref');
+        journalRefEl.innerText = getFormattedJournalReference(fuzzyMatch.item, {includingYear:true, highlightVolume: HighlightType.None});
+        journalRefEl.classList.add('bibdesk-integration-jref');
         
         const citekeyEl = document.createElement('div');
-        citekeyEl.classList.add('bibtex-integration-citekey');
+        citekeyEl.classList.add('bibdesk-integration-citekey');
 
         const hashtagEl = document.createElement('span');
         hashtagEl.textContent = '';
@@ -364,7 +364,7 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
         super.onOpen();
         this.inputEl.focus();
         this.containerEl.addEventListener('keydown', this.handleKeyDown);
-        this.modalEl.classList.add('bibtex-integration');
+        this.modalEl.classList.add('bibdesk-integration');
 
         // Use the last query
         this.inputEl.value = lastQuery;
@@ -396,14 +396,14 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
         el.empty(); // Clear the existing content
 
         const suggestionContainer = document.createElement('div');
-        suggestionContainer.classList.add('bibtex-integration-suggestions');
+        suggestionContainer.classList.add('bibdesk-integration-suggestions');
 
         const nameEl = document.createElement('div');
         nameEl.textContent = fuzzyMatch.item.parsedPath.filename;
-        nameEl.classList.add('bibtex-integration-name');
+        nameEl.classList.add('bibdesk-integration-name');
 
         const dirEl = document.createElement('div');
-        dirEl.classList.add('bibtex-integration-dir');
+        dirEl.classList.add('bibdesk-integration-dir');
         dirEl.innerText = fuzzyMatch.item.parsedPath.dir;
         
         suggestionContainer.appendChild(nameEl);

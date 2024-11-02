@@ -264,14 +264,14 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
 
                     if (!isEmpty && parsedPath.ext !== ".bib") {
                         warningEl.textContent = 'Please choose a BibTex file with .bib extension.';
-                        warningEl.style.display = 'block';
+                        warningEl.classList.remove('bibdesk-integration-hidden');
                     }
                     else if (!isEmpty && !await fileExists(normalizedPath)) {
                         warningEl.textContent = 'Please enter the path of an existing BibTex file in your vault.';
-                        warningEl.style.display = 'block';
+                        warningEl.classList.remove('bibdesk-integration-hidden');
                     } else {
                         // Hide the warning and save the valid value
-                        warningEl.style.display = 'none';
+                        warningEl.classList.add('bibdesk-integration-hidden');
                         this.plugin.settings.bibtex_filepath = value;
                         await this.plugin.saveSettings();
                     }
@@ -298,26 +298,28 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
         import_delay_setting.addText(text => {
                 import_delay_text = text;
                 const warningEl = containerEl.createEl('div', { cls: 'mod-warning' });
-                warningEl.style.display = 'none';  // Initially hide the warning
+                warningEl.classList.remove('bibdesk-integration-hidden');  // Initially hide the warning
                 return text
                     .setPlaceholder('Delay in milliseconds')
                     .setValue(`${this.plugin.settings.import_delay_ms}`)
-                    .onChange(async (value) => {
+                    .onChange(async (inputStr) => {
                         // Remove any previous warning text
                         warningEl.textContent = '';
 
+                        const inputStrWithoutSpaces = inputStr.replaceAll(' ','');
+
                         // Try to parse the input as an integer
-                        const parsedValue = parseInt(value, 10);
+                        const parsedInput = parseInt(inputStrWithoutSpaces, 10);
 
                         // Check if the value is a valid number and greater than or equal to 0
-                        if (isNaN(parsedValue) || parsedValue < 0) {
+                        if (isNaN(parsedInput) || parsedInput < 0 || (`${parsedInput}` !== inputStrWithoutSpaces)) {
                             // Show warning if the input is invalid
-                            warningEl.textContent = 'Please enter a valid number for the delay.';
-                            warningEl.style.display = 'block';
+                            warningEl.textContent = 'Please enter a valid positive integer number for the delay.';
+                            warningEl.classList.remove('bibdesk-integration-hidden');
                         } else {
                             // Hide the warning and save the valid value
-                            warningEl.style.display = 'none';
-                            this.plugin.settings.import_delay_ms = parsedValue;
+                            warningEl.classList.add('bibdesk-integration-hidden');
+                            this.plugin.settings.import_delay_ms = parsedInput;
                             await this.plugin.saveSettings();
                         }
                     });
@@ -402,7 +404,7 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
         pdf_folder_setting.addText(text => {
                 pdf_folder_text = text;
                 const warningEl = containerEl.createEl('div', { cls: 'mod-warning' });
-                warningEl.style.display = 'none';  // Initially hide the warning
+                warningEl.classList.remove('bibdesk-integration-hidden');  // Initially hide the warning
                 return text
                     .setPlaceholder('E.g.: 00 Meta/PDF++')
                     .setValue(this.plugin.settings.pdf_folder)
@@ -412,10 +414,10 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
                         const path = normalizePath(value);
                         if (!doesFolderExist(this.app.vault,path)) {
                             warningEl.textContent = 'Please enter the path of an existing folder in your vault.';
-                            warningEl.style.display = 'block';
+                            warningEl.classList.remove('bibdesk-integration-hidden');
                         } else {
                             // Hide the warning and save the valid value
-                            warningEl.style.display = 'none';
+                            warningEl.classList.add('bibdesk-integration-hidden');
                             this.plugin.settings.pdf_folder = path;
                             await this.plugin.saveSettings();
                         }

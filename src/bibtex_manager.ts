@@ -70,7 +70,7 @@ export function getFormattedJournalReference(bibEntry: BibTeXEntry, options: Jou
             }    
         }
         const pages = bibEntry.fields.pages ?? null;
-        const bothVolPage = [volume,pages].filter((x)=>x!==null).join(',')
+        const bothVolPage = [volume,pages].filter((x)=>x!==null).join(', ')
         journal_vol_page = [journal,bothVolPage].filter((x)=>x!==null).join(' ');
     }
     
