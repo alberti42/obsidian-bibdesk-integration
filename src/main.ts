@@ -1,7 +1,7 @@
 // main.ts
 
 import { BibtexManager } from 'bibtex_manager';
-import { App, FileSystemAdapter, normalizePath, PDFPlusLib, PdfPlusPlugin, Platform, Plugin, PluginManifest, PluginSettingTab, Setting, TextComponent, TFile, ToggleComponent } from 'obsidian';
+import { App, FileSystemAdapter, normalizePath, PDFPlusLib, PdfPlusPlugin, Platform, Plugin, PluginSettingTab, Setting, TextComponent, TFile, ToggleComponent } from 'obsidian';
 
 import { around } from 'monkey-around';
 
@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { BibtexIntegrationSettings, isHotkeysSettingTab } from 'types';
-import { unwatchFile, watchFile, doesFolderExist, joinPaths, set_bookmark_resolver_path, fileExists, parseFilePath } from 'utils';
+import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, fileExists, parseFilePath } from 'utils';
 
 import { DEFAULT_BIBTEX_CONTENT, DEFAULT_SETTINGS } from 'defaults';
 import { InsertCitationFuzzyModal, InsertCitekeyFuzzyModal, OpenPdfFuzzyModal } from 'citekeyFuzzyModal';
@@ -21,9 +21,8 @@ export default class BibtexIntegration extends Plugin {
     
     public bibtexManager = new BibtexManager(this);
 
-    constructor(app:App,manifest:PluginManifest) {
-        super(app,manifest);
 
+    async onload() {
         const adapter = this.app.vault.adapter;
         if (!(adapter instanceof FileSystemAdapter)) {
             throw new Error("The vault folder could not be determined.");
@@ -32,16 +31,14 @@ export default class BibtexIntegration extends Plugin {
         // Path to vault
         const vaultPath = adapter.getBasePath();
 
-        // Path to plugins folder
-        const pluginsPath = path.join(vaultPath,app.plugins.getPluginFolder());
-
         // Path to this plugin folder in the vault
-        const pluginPath = path.join(pluginsPath,manifest.id);
+        let bookmark_resolver_path = null;
+        if(this.manifest.dir) {
+            bookmark_resolver_path = path.join(vaultPath,this.manifest.dir,"bookmark_resolver");
+        }
 
-        set_bookmark_resolver_path(joinPaths(pluginPath,"bookmark_resolver"));
-    }
+        set_bookmark_resolver_path(bookmark_resolver_path);
 
-    async onload() {
         await this.loadSettings();
 
         // This adds a settings tab so the user can configure various aspects of the plugin

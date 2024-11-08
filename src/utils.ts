@@ -12,9 +12,9 @@ import { TAbstractFile, TFile, TFolder, Vault } from 'obsidian';
 let watcher: chokidar.FSWatcher | null = null;
 let watched_filepath: string | null = null;
 
-export let bookmark_resolver_path = "";
+export let bookmark_resolver_path: string|null = null;
 
-export function set_bookmark_resolver_path(path: string) {
+export function set_bookmark_resolver_path(path: string | null) {
     bookmark_resolver_path = path;
 }
 
@@ -115,7 +115,10 @@ export async function processBinaryPlist(binaryData: Uint8Array): Promise<unknow
     }
 }
 
-export async function fileExists(path:string) {
+export async function fileExists(path:string|null):Promise<boolean> {
+    if(path===null) {
+        return false;
+    }
     return await fs.stat(path).then(() => true, () => false);
 }
 
@@ -134,11 +137,17 @@ export async function fileExists(path:string) {
 // Function to resolve bookmark using the Swift command-line tool with Base64 piping
 export function run_bookmark_resolver(base64Bookmark: string): Promise<string> {
     return new Promise((resolve, reject) => {
+        
         // Use fileExists as a promise and chain the actions using .then()
         fileExists(bookmark_resolver_path).then((exists) => {
             if (!exists) {
                 reject(`could not find bookmark_resolver utility at: ${bookmark_resolver_path}`);
                 return;
+            }
+
+            if(bookmark_resolver_path===null) {
+               reject(`could not find bookmark_resolver utility`);
+                return
             }
 
             try {

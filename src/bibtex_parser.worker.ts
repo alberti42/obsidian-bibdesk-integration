@@ -8,16 +8,6 @@ function isSyntaxError(error: unknown): error is SyntaxError {
     return error instanceof SyntaxErrorFnc;
 }
 
-function max(a:number,b:number): number {
-    if(a>b) return a
-    else return b;
-}
-
-function min(a:number,b:number): number {
-    if(a<b) return a
-    else return b;
-}
-
 // Do not make this function async or otherwise errors are not detected properly
 // If you need to make it async, follow https://stackoverflow.com/a/61409478/4216175
 self.onmessage = function (event: MessageEvent) {
@@ -48,8 +38,8 @@ self.onmessage = function (event: MessageEvent) {
             const lines = bibtexText.split("\n");
 
             // Determine the range of lines to show (3 lines above and 3 lines below)
-            const startLine = max(start.line - 4, 0);
-            const endLine = min(end.line + 3, lines.length - 1);
+            const startLine = Math.max(start.line - 4, 0);
+            const endLine = Math.min(end.line + 3, lines.length - 1);
 
             console.error(`Syntax error between {line:${start.line},column:${start.column}} and {line:${end.line},column:${end.column}}`)
 
