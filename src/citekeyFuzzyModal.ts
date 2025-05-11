@@ -91,7 +91,7 @@ function insertTextAtCursor(app: App, text: string) {
     }
 }
 
-abstract class BibEntriesFuzzyModal extends FuzzySuggestModal <BibTeXEntry> {
+abstract class BibEntriesFuzzyModal extends FuzzySuggestModal<BibTeXEntry> {
 	constructor(protected plugin: BibtexIntegration, protected bibtexManager:BibtexManager) {
         super(plugin.app);
 		this.setInstructions(this.getInstructionsBasedOnOS());
@@ -366,8 +366,6 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
         this.containerEl.addEventListener('keydown', this.handleKeyDown);
         this.modalEl.classList.add('bibdesk-integration');
 
-        // Use the last query
-        this.inputEl.value = lastQuery;
         this.updateSuggestions(); 
     }
 
@@ -382,8 +380,10 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
 
     private handleKeyDown = (evt: KeyboardEvent) => {
         // evt.isComposing determines whether the event is part of a key composition
-        if (evt.key === 'Enter' && !evt.isComposing && evt.altKey) {
-            evt.preventDefault();  // Prevent default behavior of inserting a new line
+        if (evt.key === 'Enter' && !evt.isComposing) {
+            evt.preventDefault();
+            evt.stopPropagation(); // prevent bubbling to Obsidian or plugins
+
             this.chooser.useSelectedItem(evt);
         }
     }
@@ -418,7 +418,7 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
 
     onChooseItem(selectedItem: ParsedPathWithIndex, evt: MouseEvent | KeyboardEvent): void {
         const shouldCreateNewLeaf = evt.altKey;
-
+        
         let folder_path;
         if(this.plugin.settings.organize_by_years) {
             folder_path = joinPaths(this.plugin.settings.pdf_folder,this.bibEntry.fields.year ?? "unknown");
