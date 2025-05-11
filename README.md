@@ -1,4 +1,4 @@
-# Obsidian BibDesk Integration
+# BibDesk Integration Plugin for Obsidian
 
 ⚠️ **Note:** This plugin supports general BibTeX parsing, but it’s optimized for libraries created with [BibDesk](https://en.wikipedia.org/wiki/BibDesk) on macOS.
 
