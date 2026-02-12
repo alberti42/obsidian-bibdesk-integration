@@ -211,7 +211,7 @@ export async function resolveBookmark(bibEntry: BibTeXEntry, bdsk_file: string):
                 console.error('Error:', 'not valid bookmark');
                 return null;
             }
-            return await run_bookmark_resolver(uint8ArrayToBase64(plistData.bookmark));
+            return await run_bookmark_resolver(uint8ArrayToBase64(Uint8Array.from(plistData.bookmark)));
             // return await run_bookmark_resolver(bookmark_resolver_path, uint8ArrayToBase64(plistData.bookmark));
         } else {
             console.error('Error:', 'not valid plist in bibtex field bdsk-file');
