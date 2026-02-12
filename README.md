@@ -1,8 +1,9 @@
 # BibDesk Integration Plugin for Obsidian
 
-⚠️ **Note:** This plugin supports general BibTeX parsing, but it’s optimized for libraries created with [BibDesk](https://en.wikipedia.org/wiki/BibDesk) on macOS.
+This plugin integrates BibTeX libraries with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin in Obsidian, enabling you to manage and open PDFs associated with bibliography entries directly from Obsidian. It works with external BibTeX files, parsing them in the background for a seamless experience.
 
-This plugin integrates the macOS BibDesk application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin in Obsidian, enabling you to manage and open PDFs associated with BibDesk entries directly from Obsidian. It works with external BibTeX files, leveraging BibDesk's `bdsk-file-<NUMBER>` fields, which act as macOS bookmarks, allowing seamless file access even if files are renamed or moved.
+> [!NOTE]
+> This plugin works with any standard BibTeX library. However, some features are designed specifically for libraries maintained with [BibDesk](https://en.wikipedia.org/wiki/BibDesk) on macOS, such as resolving `bdsk-file-<NUMBER>` fields — macOS bookmarks that allow seamless file access even if files are renamed or moved.
 
 Unlike most BibTeX plugins for Obsidian, this plugin is designed to handle **large libraries with 10,000+ papers**:
 - parsing runs on a dedicated background thread to keep the UI responsive (no freezing, not even for an instant)
