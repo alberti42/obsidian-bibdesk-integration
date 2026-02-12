@@ -293,7 +293,7 @@ export class InsertCitationFuzzyModal extends BibEntriesFuzzyModal {
         const journalRef = getFormattedJournalReference(bibEntry, {includingYear:true, highlightVolume: HighlightType.MarkDown});
         const title = getFormattedTitle(bibEntry);
         
-        let citation = [authors, [title, journalRef].join(' ')].join(', ');
+        let citation = [authors, `\u201C${title},\u201D ${journalRef}`].join(', ');
 
         if(addBibDeskUri) {
             const BibDeskUri = getBibDeskUriLink(bibEntry);
