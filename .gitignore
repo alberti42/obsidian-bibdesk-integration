@@ -26,3 +26,7 @@ dist/*
 
 # md
 *.md
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
