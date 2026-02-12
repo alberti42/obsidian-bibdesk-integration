@@ -206,14 +206,32 @@
     '\\th': 'þ',    // þ
     '\\TH': 'Þ'     // Þ    
   };
-  const multipleWhiteSpaces = / +/g;  
+  const multipleWhiteSpaces = / +/g;
+  const stringMacros = {};
 };
 
 main
   = blocks:block* { return blocks.filter((item) => item) }
   
 block
-  = bibentry / empty_lines / comment_line / comment_block // / loose_line
+  = bibentry / string_block / preamble_block / empty_lines / comment_line / comment_block
+
+string_block
+  = "@string"i empty_chars "{" empty_chars name:$[^= \t\n}]+ empty_chars "=" empty_chars value:string_value empty_chars "}" empty_chars {
+    stringMacros[name.toLowerCase()] = value;
+    return null;
+  }
+
+string_value
+  = curly_brackets
+  / quoted_string
+  / v:$[^, }\t\n ]+ { return stringMacros[v.toLowerCase()] ?? v; }
+
+quoted_string
+  = "\"" @$[^"]* "\""
+
+preamble_block
+  = "@preamble"i empty_chars curly_brackets empty_chars { return null; }
 
 empty_lines
   = $(empty_line+) { return null; }
@@ -247,7 +265,10 @@ author_field
   = f:(empty_chars @key:"author"i empty_chars "=" empty_chars @author_list:author_list empty_chars) { return [f[0].toLowerCase(), f[1]]; }
 
 strict_field
-  = (empty_chars @key:$[^= ]+ empty_chars "=" empty_chars @$[^, ]+ empty_chars)
+  = f:(empty_chars @key:$[^= ]+ empty_chars "=" empty_chars @$[^, ]+ empty_chars) {
+    const resolved = stringMacros[f[1].toLowerCase()];
+    return [f[0].toLowerCase(), resolved !== undefined ? resolved : f[1]];
+  }
   
 generic_field
   = f:(empty_chars @(!"author"i @key:$[^= ]+) empty_chars "=" empty_chars @value:curly_brackets empty_chars) { return [f[0].toLowerCase(), f[1]]; }
