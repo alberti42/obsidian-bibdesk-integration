@@ -213,7 +213,7 @@ function peg$parse(input, options) {
   var peg$e13 = peg$literalExpectation(" ", false);
   var peg$e14 = peg$literalExpectation("and", true);
   var peg$e15 = peg$literalExpectation("%", false);
-  var peg$e16 = peg$literalExpectation("@comment", false);
+  var peg$e16 = peg$literalExpectation("@comment", true);
   var peg$e17 = peg$classExpectation(["\n"], true, false);
   var peg$e18 = peg$classExpectation(["\n"], false, false);
   var peg$e19 = peg$classExpectation([" ", "\n", "\t"], false, false);
@@ -1752,8 +1752,8 @@ function peg$parse(input, options) {
     var s0, s1, s2, s3, s4, s5, s6;
 
     s0 = peg$currPos;
-    if (input.substr(peg$currPos, 8) === peg$c11) {
-      s1 = peg$c11;
+    s1 = input.substr(peg$currPos, 8);
+    if (s1.toLowerCase() === peg$c11) {
       peg$currPos += 8;
     } else {
       s1 = peg$FAILED;

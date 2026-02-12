@@ -303,7 +303,7 @@ comment_line
   = $(_* "%" loose_line) { return null; }
 
 comment_block
-  = "@comment" $([^ {]*) empty_chars curly_brackets empty_chars newline? { return null; }
+  = "@comment"i $([^ {]*) empty_chars curly_brackets empty_chars newline? { return null; }
 
 loose_line
   = t:$(([^\n]* newline) ) { return null; }
