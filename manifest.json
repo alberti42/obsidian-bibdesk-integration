@@ -1,7 +1,7 @@
 {
 	"id": "bibdesk-integration",
 	"name": "BibDesk Integration",
-	"version": "1.0.4",
+	"version": "1.1.0",
 	"minAppVersion": "1.5.0",
 	"description": "Import BibTex citations into your notes and open PDF documents linked in a BibDesk library.",
 	"author": "Andrea Alberti",
