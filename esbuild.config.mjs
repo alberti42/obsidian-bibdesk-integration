@@ -79,7 +79,7 @@ const buildMain = async () => {
                 name: 'replace-fsevents',
                 setup(build) {
                     // Hook into the resolve phase
-                    build.onResolve({ filter: /fsevents/ }, () => {
+                    build.onResolve({ filter: /^fsevents$/ }, () => {
                         return { path: 'null', namespace: 'fsevents' };
                     });
 
