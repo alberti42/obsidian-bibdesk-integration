@@ -1,7 +1,7 @@
 // citekeyFuzzyModal.ts
 
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { App, FuzzyMatch, FuzzySuggestModal, MarkdownView, normalizePath, Notice, Platform, TFile } from 'obsidian';
+import { App, FuzzyMatch, FuzzySuggestModal, normalizePath, Notice, Platform, TFile } from 'obsidian';
 
 import BibtexIntegration from 'main';
 import { BibTeXEntry, FormatType, HighlightType, ParsedPathWithIndex } from 'types';
@@ -63,31 +63,14 @@ async function openBdskDocument(
 }
 
 function insertTextAtCursor(app: App, text: string) {
-    // Find the current Markdown editor
-    const activeView:MarkdownView|null = app.workspace.getActiveViewOfType(MarkdownView);
-    const leaf = activeView ? activeView.leaf : null;
+    const editor = app.workspace.activeEditor?.editor ?? null;
 
-    // Ensure the leaf is open and writable (not pinned)
-    if (leaf && !leaf.view.leaf.getViewState().pinned) {
-        // Get the editor instance from the leaf
-        const editor = activeView ? activeView.editor : null;
-        
-        if (editor) {
-            // Get the current cursor position
-            const cursor = editor.getCursor();
-
-            // Insert the text at the current cursor position
-            editor.replaceRange(text, cursor);
-
-            // Move the cursor to the end of the inserted text
-            const newCursorPos = {
-                line: cursor.line,
-                ch: cursor.ch + text.length // Move the cursor to the end of the inserted text
-            };
-            editor.setCursor(newCursorPos);
-        }
+    if (editor) {
+        const cursor = editor.getCursor();
+        editor.replaceRange(text, cursor);
+        editor.setCursor({ line: cursor.line, ch: cursor.ch + text.length });
     } else {
-        console.log('No active writable leaf or the leaf is pinned.');
+        console.log('No active editor found.');
     }
 }
 
