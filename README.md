@@ -2,11 +2,16 @@
 
 ⚠️ **Note:** This plugin supports general BibTeX parsing, but it’s optimized for libraries created with [BibDesk](https://en.wikipedia.org/wiki/BibDesk) on macOS.
 
-This plugin integrates the macOS BibDesk application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin in Obsidian, enabling you to manage and open PDFs associated with BibDesk entries directly from Obsidian. It works with external BibTeX files, leveraging BibDesk’s `bdsk-file-<NUMBER>` fields, which act as macOS bookmarks, allowing seamless file access even if files are renamed or moved.
+This plugin integrates the macOS BibDesk application with the [PDF++](https://github.com/RyotaUshio/obsidian-pdf-plus) plugin in Obsidian, enabling you to manage and open PDFs associated with BibDesk entries directly from Obsidian. It works with external BibTeX files, leveraging BibDesk's `bdsk-file-<NUMBER>` fields, which act as macOS bookmarks, allowing seamless file access even if files are renamed or moved.
 
-### Features
+Unlike most BibTeX plugins for Obsidian, this plugin is designed to handle **large libraries with 10,000+ papers**:
+- parsing runs on a dedicated background thread to keep the UI responsive (no freezing, not even for an instant)
+- using a **custom high-performance parser** built with [Peggy](https://peggyjs.org/) makes parsing large BibTex files faster than any TypeScript-based BibTeX parsers I could test, and even BibDesk's own parser.
+
+
+### Additional Features
+- **Automatic reloading**: The BibTeX library is also watched for changes and re-parsed automatically in the background whenever the `bib` file is updated 
 - **External Library Support**: Your BibDesk library does not need to reside within your Obsidian vault, making it ideal for large libraries (several GBs).
-- **Optimized BibTeX Parser**: A custom BibTeX parser, faster than alternatives available for TypeScript and even BibDesk's own parser. Parsing occurs on a separate thread, ensuring minimal latency for Obsidian.
 - **Integration with PDF++**: Opens PDFs stored outside your Obsidian vault via the PDF++ plugin.
 
 ### Screenshots
