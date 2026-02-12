@@ -262,7 +262,7 @@ function peg$parse(input, options) {
     return [f[0].toLowerCase(), resolved !== undefined ? resolved : f[1]];
   };
   var peg$f8 = function(f) { return [f[0].toLowerCase(), f[1]]; };
-  var peg$f9 = function(last, first) { 
+  var peg$f9 = function(last, first) {
     if(!first) {
       // This should not occur, but some bad bibentry misses the first name
       const name_parts = last.split(' ');
@@ -278,7 +278,7 @@ function peg$parse(input, options) {
   var peg$f11 = function(char) { return char.join(''); };
   var peg$f12 = function(t) {
   const accented = accentMap[t.replace(multipleWhiteSpaces,' ')];
-  return accented ?? t; 
+  return accented ?? t;
 };
   var peg$f13 = function() { return null; };
   var peg$f14 = function() { return null; };
