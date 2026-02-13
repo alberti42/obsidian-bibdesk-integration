@@ -6,9 +6,9 @@
     "scripts": {
         "dev": "node esbuild.config.mjs",
         "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-        "version": "node version-bump.mjs && git add manifest.json versions.json",
+        "version": "node version-bump.mjs && git add manifest.json versions.json bookmark_resolver/bookmark_resolver.swift",
         "grammar": "peggy --format es src/grammar.pegjs -o src/peggy.mjs",
-        "bookmark_resolver": "swiftc -O -target arm64-apple-macosx11.0 -o dist/bookmark_resolver-arm64 bookmark_resolver/bookmark_resolver.swift && swiftc -O -target x86_64-apple-macosx11.0 -o dist/bookmark_resolver-x86_64 bookmark_resolver/bookmark_resolver.swift && lipo -create dist/bookmark_resolver-arm64 dist/bookmark_resolver-x86_64 -output dist/bookmark_resolver && rm dist/bookmark_resolver-arm64 dist/bookmark_resolver-x86_64 && codesign --sign 'Developer ID Application: Andrea Alberti (9V3X7C8VCK)' --options runtime dist/bookmark_resolver"
+        "bookmark_resolver": "node esbuild.bookmark_resolver.mjs"
     },
     "keywords": [],
     "author": "Andrea Alberti",

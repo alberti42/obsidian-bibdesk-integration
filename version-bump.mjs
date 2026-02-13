@@ -12,3 +12,9 @@ writeFileSync("manifest.json", JSON.stringify(manifest, null, "\t"));
 let versions = JSON.parse(readFileSync("versions.json", "utf8"));
 versions[targetVersion] = minAppVersion;
 writeFileSync("versions.json", JSON.stringify(versions, null, "\t"));
+
+// update VERSION in bookmark_resolver.swift
+const swiftPath = "bookmark_resolver/bookmark_resolver.swift";
+let swiftSource = readFileSync(swiftPath, "utf8");
+swiftSource = swiftSource.replace(/^let VERSION = ".*"/m, `let VERSION = "${targetVersion}"`);
+writeFileSync(swiftPath, swiftSource);
