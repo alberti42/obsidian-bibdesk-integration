@@ -3,11 +3,11 @@
 import * as bplist from 'bplist-parser';
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
-import { BibTeXEntry, isBookmark, ParsedPath, ParsedUri, Queries } from 'types';
+import { BibTeXEntry, BookmarkResolverStatus, isBookmark, ParsedPath, ParsedUri, Queries } from 'types';
 import { pathToFileURL } from 'url';
 import * as chokidar from 'chokidar'; // to watch for file changes
 import BibtexIntegration from 'main';
-import { TAbstractFile, TFile, TFolder, Vault } from 'obsidian';
+import { Notice, requestUrl, TAbstractFile, TFile, TFolder, Vault } from 'obsidian';
 
 let watcher: chokidar.FSWatcher | null = null;
 let watched_filepath: string | null = null;
@@ -133,6 +133,78 @@ export async function fileExists(path:string|null):Promise<boolean> {
         throw error; // Re-throw the error if it's not related to the existence check
     }
 }*/
+
+const GITHUB_REPO = "alberti42/obsidian-bibtex-integration";
+
+function getBookmarkResolverVersion(): Promise<string | null> {
+    return new Promise((resolve) => {
+        if (!bookmark_resolver_path) {
+            resolve(null);
+            return;
+        }
+
+        fileExists(bookmark_resolver_path).then((exists) => {
+            if (!exists) {
+                resolve(null);
+                return;
+            }
+
+            try {
+                const child = spawn(bookmark_resolver_path!, ['--version'], { stdio: ['pipe', 'pipe', 'pipe'] });
+                let stdout = '';
+
+                child.stdout.on('data', (data) => {
+                    stdout += data.toString();
+                });
+
+                child.on('error', () => {
+                    resolve(null);
+                });
+
+                child.on('close', (code) => {
+                    if (code === 0 && stdout.trim()) {
+                        resolve(stdout.trim());
+                    } else {
+                        resolve(null);
+                    }
+                });
+            } catch {
+                resolve(null);
+            }
+        }).catch(() => {
+            resolve(null);
+        });
+    });
+}
+
+export async function ensureBookmarkResolver(expectedVersion: string): Promise<BookmarkResolverStatus> {
+    if (!bookmark_resolver_path) {
+        return "failed";
+    }
+
+    const currentVersion = await getBookmarkResolverVersion();
+    if (currentVersion === expectedVersion) {
+        return "up-to-date";
+    }
+
+    const action = currentVersion ? "Updating" : "Downloading";
+    const notice = new Notice(`BibDesk Integration: ${action} bookmark resolver...`, 0);
+
+    try {
+        const url = `https://github.com/${GITHUB_REPO}/releases/download/${expectedVersion}/bookmark_resolver`;
+        const response = await requestUrl({ url });
+        await fs.writeFile(bookmark_resolver_path, new Uint8Array(response.arrayBuffer));
+        await fs.chmod(bookmark_resolver_path, 0o755);
+        notice.hide();
+        new Notice(`BibDesk Integration: bookmark resolver ${action.toLowerCase()} successfully.`);
+        return "downloaded";
+    } catch (error) {
+        notice.hide();
+        new Notice("BibDesk Integration: failed to download bookmark resolver. PDF bookmark features will be unavailable.");
+        console.error("BibDesk Integration: failed to download bookmark resolver:", error);
+        return "failed";
+    }
+}
 
 // Function to resolve bookmark using the Swift command-line tool with Base64 piping
 export function run_bookmark_resolver(base64Bookmark: string): Promise<string> {

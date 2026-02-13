@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { BibtexIntegrationSettings, isHotkeysSettingTab } from 'types';
-import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, fileExists, parseFilePath } from 'utils';
+import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, ensureBookmarkResolver, fileExists, parseFilePath } from 'utils';
 
 import { DEFAULT_BIBTEX_CONTENT, DEFAULT_SETTINGS } from 'defaults';
 import { InsertCitationFuzzyModal, InsertCitekeyFuzzyModal, OpenPdfFuzzyModal } from 'citekeyFuzzyModal';
@@ -38,6 +38,9 @@ export default class BibtexIntegration extends Plugin {
         }
 
         set_bookmark_resolver_path(bookmark_resolver_path);
+
+        // Ensure bookmark_resolver binary is present and up-to-date
+        ensureBookmarkResolver(this.manifest.version).then(result => console.log(result));
 
         await this.loadSettings();
 

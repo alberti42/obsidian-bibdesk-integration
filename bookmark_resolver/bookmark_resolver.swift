@@ -1,5 +1,7 @@
 import Foundation
 
+let VERSION = "1.1.0"
+
 // Helper function to resolve bookmark data and print the resolved path
 func resolveBookmark(from bookmarkData: Data) {
     do {
@@ -13,7 +15,10 @@ func resolveBookmark(from bookmarkData: Data) {
 }
 
 // Main logic
-if CommandLine.argc == 3, CommandLine.arguments[1] == "-f" {
+if CommandLine.argc == 2, CommandLine.arguments[1] == "--version" {
+    print(VERSION)
+    exit(0)
+} else if CommandLine.argc == 3, CommandLine.arguments[1] == "-f" {
     // Handle the case where a file path is provided with the `-f` option
     let bookmarkPath = CommandLine.arguments[2]
     do {
