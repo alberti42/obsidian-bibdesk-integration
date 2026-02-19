@@ -44,14 +44,15 @@ if CommandLine.argc == 2, CommandLine.arguments[1] == "--version" {
     Usage: bookmark_resolver -f <path_to_bookmark_file>
            or
            echo "<base64_encoded_bookmark>" | bookmark_resolver -p
-    
+
     Options:
     -f <path_to_bookmark_file>   : Provide the path to a file containing bookmark data.
     -p                           : Accept Base64 encoded bookmark via pipe.
-    
+    --version                    : Print the version and exit.
+
     Example 1 (with file):
       ./bookmark_resolver -f /path/to/bookmark_file
-    
+
     Example 2 (with pipe):
       echo "Ym9va1wEAAAAAAQQMAAAAAAAAAAAAAAAAA..." | ./bookmark_resolver -p
     """)
