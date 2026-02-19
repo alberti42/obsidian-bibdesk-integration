@@ -237,9 +237,12 @@ export class BookmarkResolverNagModal extends Modal {
         const { contentEl } = this;
         contentEl.createEl('h2', { text: 'Bookmark resolver notice' });
         contentEl.createEl('p', { text:
-            'PDF bookmarks are being resolved using the AppleScript resolver, ' +
-            'which is slower than the native Swift binary. You can inspect the ' +
-            'script, switch to the faster binary, or silence this notice.' });
+            'PDF bookmarks are currently being resolved using the AppleScript resolver, ' +
+            'which you can inspect for transparency by clicking on the button. ' + 
+            'However, we recommend switching to the binary resolver that is faster than the AppleScript.' +
+            'The only downside is that it cannot be directly inspected.\nFor those who value security above all, you can inspect the source code ' + 
+            'under this [link](https://github.com/alberti42/obsidian-bibdesk-integration/blob/main/bookmark_resolver/bookmark_resolver.swift) ' + 
+            'and then compile it to a binary yourself; follow the instruction in the [README.md](https://github.com/alberti42/obsidian-bibdesk-integration).' });
 
         new Setting(contentEl)
             .setName('Inspect the resolver script')
