@@ -282,13 +282,13 @@ export class BookmarkResolverNagModal extends Modal {
                 }));
 
         new Setting(contentEl)
-            .setName("Don't show again")
-            .setDesc('Silence this notice. You can change the resolver in Settings at any time.')
+            .setName('Manage resolver settings')
+            .setDesc('Open the plugin settings to configure the resolver or suppress this notice.')
             .addButton(btn => btn
-                .setButtonText("Don't show again")
-                .onClick(async () => {
-                    this.plugin.settings.suppress_resolver_nag = true;
-                    await this.plugin.saveSettings();
+                .setButtonText('Open Settings')
+                .onClick(() => {
+                    this.app.setting.open();
+                    this.app.setting.openTabById(this.plugin.manifest.id);
                     this.close();
                 }));
     }

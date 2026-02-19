@@ -28,6 +28,7 @@ declare module "obsidian" {
         ): void;
     }
     interface Setting {
+        open(): void;
         onOpen(): void;
         onClose(): void;
 
