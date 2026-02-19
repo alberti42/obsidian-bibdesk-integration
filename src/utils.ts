@@ -32,7 +32,7 @@ export function set_use_native_binary(value: boolean) {
 
 // Joins multiple path segments into a single normalized path.
 export function joinPaths(...paths: string[]): string {
-    return paths.join('/');
+    return paths.join('/').replace(/\/+/g, '/');
 }
 
 export function parseFilePath(filePath: string): ParsedPath {

@@ -412,18 +412,21 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
                     .setPlaceholder('E.g.: 00 Meta/PDF++')
                     .setValue(this.plugin.settings.pdf_folder)
                     .onChange(async (value) => {
-                        // Remove any previous warning text
                         warningEl.textContent = '';
-                        const path = normalizePath(value);
-                        if (!doesFolderExist(this.app.vault,path)) {
-                            warningEl.textContent = 'Please enter the path of an existing folder in your vault.';
+                        if (value.trim() === '') {
+                            warningEl.textContent = 'Please enter a folder path.';
+                            warningEl.classList.remove('bibdesk-integration-hidden');
+                            return;
+                        }
+                        const normalizedValue = normalizePath(value);
+                        if (!doesFolderExist(this.app.vault, normalizedValue)) {
+                            warningEl.textContent = 'Folder does not exist yet — it will be created when first used.';
                             warningEl.classList.remove('bibdesk-integration-hidden');
                         } else {
-                            // Hide the warning and save the valid value
                             warningEl.classList.add('bibdesk-integration-hidden');
-                            this.plugin.settings.pdf_folder = path;
-                            await this.plugin.saveSettings();
                         }
+                        this.plugin.settings.pdf_folder = normalizedValue;
+                        await this.plugin.saveSettings();
                     });
             });
 

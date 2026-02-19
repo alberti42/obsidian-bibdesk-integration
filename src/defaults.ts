@@ -6,7 +6,7 @@ export const DEFAULT_SETTINGS: BibtexIntegrationSettings = {
     bibtex_filepath: '',
     import_delay_ms: 750,
     debug_parser: false,
-    pdf_folder: '/',
+    pdf_folder: '00 Meta/PDF++',
     use_demo_entries: true,
     organize_by_years: true,
     use_native_binary: false,

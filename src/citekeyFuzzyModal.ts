@@ -20,7 +20,7 @@ async function openBdskDocument(
             shouldCreateNewLeaf: boolean = true
         ) {
     
-    createFolderIfNotExists(app.vault,pdf_folder);
+    await createFolderIfNotExists(app.vault,pdf_folder);
     
     const pdf_content = encodeURI(`x-bdsk://${citekey}?doc=${doc}`);
 
