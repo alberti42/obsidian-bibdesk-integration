@@ -236,13 +236,26 @@ export class BookmarkResolverNagModal extends Modal {
     onOpen() {
         const { contentEl } = this;
         contentEl.createEl('h2', { text: 'Bookmark resolver notice' });
-        contentEl.createEl('p', { text:
+        contentEl.createEl('p').appendText(
             'PDF bookmarks are currently being resolved using the AppleScript resolver, ' +
-            'which you can inspect for transparency by clicking on the button. ' + 
-            'However, we recommend switching to the binary resolver that is faster than the AppleScript.' +
-            'The only downside is that it cannot be directly inspected.\nFor those who value security above all, you can inspect the source code ' + 
-            'under this [link](https://github.com/alberti42/obsidian-bibdesk-integration/blob/main/bookmark_resolver/bookmark_resolver.swift) ' + 
-            'and then compile it to a binary yourself; follow the instruction in the [README.md](https://github.com/alberti42/obsidian-bibdesk-integration).' });
+            'which you can inspect for transparency by clicking the button below. ' +
+            'We recommend switching to the faster compiled binary; ' +
+            'the only downside is that it cannot be directly inspected.');
+
+        const p2 = contentEl.createEl('p');
+        p2.appendText('If security is a concern, you can review the ');
+        p2.createEl('a', {
+            href: 'https://github.com/alberti42/obsidian-bibdesk-integration/blob/main/bookmark_resolver/bookmark_resolver.swift',
+            text: 'Swift source code',
+            cls: 'external-link',
+        });
+        p2.appendText(' and compile it yourself; see the ');
+        p2.createEl('a', {
+            href: 'https://github.com/alberti42/obsidian-bibdesk-integration',
+            text: 'README',
+            cls: 'external-link',
+        });
+        p2.appendText(' for instructions.');
 
         new Setting(contentEl)
             .setName('Inspect the resolver script')
