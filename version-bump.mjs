@@ -18,3 +18,9 @@ const swiftPath = "bookmark_resolver/bookmark_resolver.swift";
 let swiftSource = readFileSync(swiftPath, "utf8");
 swiftSource = swiftSource.replace(/^let VERSION = ".*"/m, `let VERSION = "${targetVersion}"`);
 writeFileSync(swiftPath, swiftSource);
+
+// update scriptVersion in bookmark_resolver.applescript
+const applescriptPath = "bookmark_resolver/bookmark_resolver.applescript";
+let applescriptSource = readFileSync(applescriptPath, "utf8");
+applescriptSource = applescriptSource.replace(/^property scriptVersion : ".*"/m, `property scriptVersion : "${targetVersion}"`);
+writeFileSync(applescriptPath, applescriptSource);
