@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { BibtexIntegrationSettings, isHotkeysSettingTab } from 'types';
-import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, ensureBookmarkResolver, fileExists, parseFilePath } from 'utils';
+import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, set_bookmark_resolver_script_path, set_use_native_binary, ensureBookmarkResolver, fileExists, parseFilePath } from 'utils';
 
 import { DEFAULT_BIBTEX_CONTENT, DEFAULT_SETTINGS } from 'defaults';
 import { InsertCitationFuzzyModal, InsertCitekeyFuzzyModal, OpenPdfFuzzyModal } from 'citekeyFuzzyModal';
@@ -31,18 +31,21 @@ export default class BibtexIntegration extends Plugin {
         // Path to vault
         const vaultPath = adapter.getBasePath();
 
-        // Path to this plugin folder in the vault
-        let bookmark_resolver_path = null;
-        if(this.manifest.dir) {
-            bookmark_resolver_path = path.join(vaultPath,this.manifest.dir,"bookmark_resolver");
-        }
+        // Paths to bookmark resolver artifacts in the plugin folder
+        const pluginDir = this.manifest.dir
+            ? path.join(vaultPath, this.manifest.dir)
+            : null;
 
-        set_bookmark_resolver_path(bookmark_resolver_path);
-
-        // Ensure bookmark_resolver binary is present and up-to-date
-        ensureBookmarkResolver(this.manifest.version).then(result => console.log(result));
+        set_bookmark_resolver_path(pluginDir ? path.join(pluginDir, 'bookmark_resolver') : null);
+        set_bookmark_resolver_script_path(pluginDir ? path.join(pluginDir, 'bookmark_resolver.scpt') : null);
 
         await this.loadSettings();
+
+        // Apply the bookmark resolver mode from settings, then ensure artifacts are present
+        set_use_native_binary(this.settings.use_native_binary);
+        ensureBookmarkResolver(this.manifest.version, this.settings.use_native_binary)
+            .then(() => console.log("BibDesk Integration: bookmark resolver ready."))
+            .catch(error => console.error("BibDesk Integration: ensureBookmarkResolver error:", error));
 
         // This adds a settings tab so the user can configure various aspects of the plugin
         this.addSettingTab(new BibtexIntegrationSettingTab(this.app, this));

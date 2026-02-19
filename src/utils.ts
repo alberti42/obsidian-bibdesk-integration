@@ -3,7 +3,7 @@
 import * as bplist from 'bplist-parser';
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
-import { BibTeXEntry, BookmarkResolverStatus, isBookmark, ParsedPath, ParsedUri, Queries } from 'types';
+import { BibTeXEntry, isBookmark, ParsedPath, ParsedUri, Queries } from 'types';
 import { pathToFileURL } from 'url';
 import * as chokidar from 'chokidar'; // to watch for file changes
 import BibtexIntegration from 'main';
@@ -16,6 +16,18 @@ export let bookmark_resolver_path: string|null = null;
 
 export function set_bookmark_resolver_path(path: string | null) {
     bookmark_resolver_path = path;
+}
+
+export let bookmark_resolver_script_path: string | null = null;
+
+export function set_bookmark_resolver_script_path(path: string | null) {
+    bookmark_resolver_script_path = path;
+}
+
+export let use_native_binary = false;
+
+export function set_use_native_binary(value: boolean) {
+    use_native_binary = value;
 }
 
 // Joins multiple path segments into a single normalized path.
@@ -177,49 +189,110 @@ function getBookmarkResolverVersion(): Promise<string | null> {
     });
 }
 
-export async function ensureBookmarkResolver(expectedVersion: string): Promise<BookmarkResolverStatus> {
-    if (!bookmark_resolver_path) {
-        return "failed";
-    }
-
-    const currentVersion = await getBookmarkResolverVersion();
-    if (currentVersion === expectedVersion) {
-        return "up-to-date";
-    }
-
-    const action = currentVersion ? "Updating" : "Downloading";
-    const notice = new Notice(`BibDesk Integration: ${action} bookmark resolver...`, 0);
-
+async function getBookmarkResolverScriptVersion(): Promise<string | null> {
+    if (!bookmark_resolver_script_path) return null;
+    const versionFile = bookmark_resolver_script_path + '.version';
+    if (!(await fileExists(versionFile))) return null;
     try {
-        const url = `https://github.com/${GITHUB_REPO}/releases/download/${expectedVersion}/bookmark_resolver`;
-        const response = await requestUrl({ url });
-        await fs.writeFile(bookmark_resolver_path, new Uint8Array(response.arrayBuffer));
-        await fs.chmod(bookmark_resolver_path, 0o755);
-        notice.hide();
-        new Notice(`BibDesk Integration: bookmark resolver ${action.toLowerCase()} successfully.`);
-        return "downloaded";
-    } catch (error) {
-        notice.hide();
-        new Notice("BibDesk Integration: failed to download bookmark resolver. PDF bookmark features will be unavailable.");
-        console.error("BibDesk Integration: failed to download bookmark resolver:", error);
-        return "failed";
+        return (await fs.readFile(versionFile, 'utf8')).trim() || null;
+    } catch {
+        return null;
     }
 }
 
-// Function to resolve bookmark using the Swift command-line tool with Base64 piping
-export function run_bookmark_resolver(base64Bookmark: string): Promise<string> {
+export async function ensureBookmarkResolver(expectedVersion: string, useNativeBinary: boolean): Promise<void> {
+    // Always ensure the AppleScript resolver is present and up-to-date
+    if (bookmark_resolver_script_path) {
+        const scriptVersion = await getBookmarkResolverScriptVersion();
+        if (scriptVersion !== expectedVersion) {
+            const action = scriptVersion ? "Updating" : "Downloading";
+            const notice = new Notice(`BibDesk Integration: ${action} bookmark resolver script...`, 0);
+            try {
+                const url = `https://github.com/${GITHUB_REPO}/releases/download/${expectedVersion}/bookmark_resolver.scpt`;
+                const response = await requestUrl({ url });
+                await fs.writeFile(bookmark_resolver_script_path, new Uint8Array(response.arrayBuffer));
+                await fs.writeFile(bookmark_resolver_script_path + '.version', expectedVersion, 'utf8');
+                notice.hide();
+                new Notice(`BibDesk Integration: bookmark resolver script ${action.toLowerCase()} successfully.`);
+            } catch (error) {
+                notice.hide();
+                new Notice("BibDesk Integration: failed to download bookmark resolver script. PDF bookmark features will be unavailable.");
+                console.error("BibDesk Integration: failed to download bookmark resolver script:", error);
+            }
+        }
+    }
+
+    // Ensure the Swift binary only when opted in
+    if (useNativeBinary) {
+        if (!bookmark_resolver_path) return;
+
+        const currentVersion = await getBookmarkResolverVersion();
+        if (currentVersion === expectedVersion) return;
+
+        const action = currentVersion ? "Updating" : "Downloading";
+        const notice = new Notice(`BibDesk Integration: ${action} bookmark resolver binary...`, 0);
+        try {
+            const url = `https://github.com/${GITHUB_REPO}/releases/download/${expectedVersion}/bookmark_resolver`;
+            const response = await requestUrl({ url });
+            await fs.writeFile(bookmark_resolver_path, new Uint8Array(response.arrayBuffer));
+            await fs.chmod(bookmark_resolver_path, 0o755);
+            notice.hide();
+            new Notice(`BibDesk Integration: bookmark resolver binary ${action.toLowerCase()} successfully.`);
+        } catch (error) {
+            notice.hide();
+            new Notice("BibDesk Integration: failed to download bookmark resolver binary.");
+            console.error("BibDesk Integration: failed to download bookmark resolver binary:", error);
+        }
+    }
+}
+
+// Resolve a bookmark using the AppleScript resolver (osascript)
+function run_bookmark_resolver_script(base64Bookmark: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        
-        // Use fileExists as a promise and chain the actions using .then()
-        fileExists(bookmark_resolver_path).then((exists) => {
-            if (!exists) {
-                reject(`could not find bookmark_resolver utility at: ${bookmark_resolver_path}`);
+        fileExists(bookmark_resolver_script_path).then((exists) => {
+            if (!exists || bookmark_resolver_script_path === null) {
+                reject(`could not find bookmark_resolver script at: ${bookmark_resolver_script_path}`);
                 return;
             }
 
-            if(bookmark_resolver_path===null) {
-               reject(`could not find bookmark_resolver utility`);
-                return
+            try {
+                const child = spawn('osascript', [bookmark_resolver_script_path, base64Bookmark], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+                let stdout = '';
+                let stderr = '';
+
+                child.stdout.on('data', (data) => { stdout += data.toString(); });
+                child.stderr.on('data', (data) => { stderr += data.toString(); });
+
+                child.on('error', (error) => {
+                    console.error("Child process error:", error);
+                    reject(`failed to spawn osascript: ${error.message}`);
+                });
+
+                child.on('close', (code) => {
+                    if (code !== 0 || stderr) {
+                        console.error(`Error: osascript exited with code ${code}, stderr: ${stderr}`);
+                        reject(`could not resolve bookmark: ${stderr || 'Unknown error'}`);
+                    } else {
+                        resolve(stdout.trim());
+                    }
+                });
+            } catch (error) {
+                reject(`could not execute osascript: ${error}`);
+            }
+        }).catch(error => {
+            reject(`failed to check if script exists: ${error}`);
+        });
+    });
+}
+
+// Resolve a bookmark using the Swift binary resolver
+function run_bookmark_resolver_binary(base64Bookmark: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        fileExists(bookmark_resolver_path).then((exists) => {
+            if (!exists || bookmark_resolver_path === null) {
+                reject(`could not find bookmark_resolver utility at: ${bookmark_resolver_path}`);
+                return;
             }
 
             try {
@@ -229,46 +302,43 @@ export function run_bookmark_resolver(base64Bookmark: string): Promise<string> {
                 let stdout = '';
                 let stderr = '';
 
-                // Collect stdout data
-                child.stdout.on('data', (data) => {
-                    stdout += data.toString();
-                });
+                child.stdout.on('data', (data) => { stdout += data.toString(); });
+                child.stderr.on('data', (data) => { stderr += data.toString(); });
 
-                // Collect stderr data
-                child.stderr.on('data', (data) => {
-                    stderr += data.toString();
-                });
-
-                // Handle process errors
                 child.on('error', (error) => {
                     console.error("Child process error:", error);
                     reject(`failed to spawn process: ${error.message}`);
                 });
 
-                // Handle process exit
                 child.on('close', (code) => {
                     if (code !== 0 || stderr) {
                         console.error(`Error: process exited with code ${code}, stderr: ${stderr}`);
                         reject(`could not resolve bookmark: ${stderr || 'Unknown error'}`);
                     } else {
-                        resolve(stdout.trim()); // trim to remove extra newlines
+                        resolve(stdout.trim());
                     }
                 });
 
                 // Write the Base64 bookmark to stdin
                 if (child.stdin) {
                     child.stdin.write(base64Bookmark);
-                    child.stdin.end(); // Signal that we are done writing to stdin
+                    child.stdin.end();
                 }
             } catch (error) {
                 reject(`could not execute bookmark_resolver utility: ${error}`);
-                return;
             }
         }).catch(error => {
             reject(`failed to check if file exists: ${error}`);
-            return;
         });
     });
+}
+
+export function run_bookmark_resolver(base64Bookmark: string): Promise<string> {
+    if (use_native_binary) {
+        return run_bookmark_resolver_binary(base64Bookmark);
+    } else {
+        return run_bookmark_resolver_script(base64Bookmark);
+    }
 }
 
 export async function resolveBookmark(bibEntry: BibTeXEntry, bdsk_file: string): Promise<string|null> {

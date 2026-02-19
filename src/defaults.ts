@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS: BibtexIntegrationSettings = {
     pdf_folder: '/',
     use_demo_entries: true,
     organize_by_years: true,
+    use_native_binary: false,
 }
 
 export const AuthorOptionsDefault: AuthorFormatOptions = {
