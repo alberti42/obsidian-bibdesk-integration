@@ -189,15 +189,45 @@ function getBookmarkResolverVersion(): Promise<string | null> {
     });
 }
 
-async function getBookmarkResolverScriptVersion(): Promise<string | null> {
-    if (!bookmark_resolver_script_path) return null;
-    const versionFile = bookmark_resolver_script_path + '.version';
-    if (!(await fileExists(versionFile))) return null;
-    try {
-        return (await fs.readFile(versionFile, 'utf8')).trim() || null;
-    } catch {
-        return null;
-    }
+function getBookmarkResolverScriptVersion(): Promise<string | null> {
+    return new Promise((resolve) => {
+        if (!bookmark_resolver_script_path) {
+            resolve(null);
+            return;
+        }
+
+        fileExists(bookmark_resolver_script_path).then((exists) => {
+            if (!exists) {
+                resolve(null);
+                return;
+            }
+
+            try {
+                const child = spawn('osascript', [bookmark_resolver_script_path!, '--version'], { stdio: ['pipe', 'pipe', 'pipe'] });
+                let stdout = '';
+
+                child.stdout.on('data', (data) => {
+                    stdout += data.toString();
+                });
+
+                child.on('error', () => {
+                    resolve(null);
+                });
+
+                child.on('close', (code) => {
+                    if (code === 0 && stdout.trim()) {
+                        resolve(stdout.trim());
+                    } else {
+                        resolve(null);
+                    }
+                });
+            } catch {
+                resolve(null);
+            }
+        }).catch(() => {
+            resolve(null);
+        });
+    });
 }
 
 export async function ensureBookmarkResolver(expectedVersion: string, useNativeBinary: boolean): Promise<void> {
@@ -211,7 +241,6 @@ export async function ensureBookmarkResolver(expectedVersion: string, useNativeB
                 const url = `https://github.com/${GITHUB_REPO}/releases/download/${expectedVersion}/bookmark_resolver.scpt`;
                 const response = await requestUrl({ url });
                 await fs.writeFile(bookmark_resolver_script_path, new Uint8Array(response.arrayBuffer));
-                await fs.writeFile(bookmark_resolver_script_path + '.version', expectedVersion, 'utf8');
                 notice.hide();
                 new Notice(`BibDesk Integration: bookmark resolver script ${action.toLowerCase()} successfully.`);
             } catch (error) {
