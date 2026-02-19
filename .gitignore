@@ -23,11 +23,3 @@ dist/*
 
 # iCLoud
 *.nosync
-
-# md
-*.md
-!CHANGELOG.md
-
-# Sublime
-*.sublime-project
-*.sublime-workspace
