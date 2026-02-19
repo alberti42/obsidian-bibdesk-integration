@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -46,6 +48,11 @@ jobs:
           NOTES="release-notes/release_${VERSION}.md"
           if [ ! -f "$NOTES" ]; then
             echo "No release notes provided for version ${VERSION}." > "$NOTES"
+          fi
+          PREV_TAG=$(git tag --sort=-version:refname | grep -A1 "^${VERSION}$" | tail -1)
+          if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$VERSION" ]; then
+            echo "" >> "$NOTES"
+            echo "**Full changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}" >> "$NOTES"
           fi
 
       - name: Create GitHub release
