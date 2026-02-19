@@ -1,15 +1,16 @@
 // main.ts
 
 import { BibtexManager } from 'bibtex_manager';
-import { App, FileSystemAdapter, normalizePath, PDFPlusLib, PdfPlusPlugin, Platform, Plugin, PluginSettingTab, Setting, TextComponent, TFile, ToggleComponent } from 'obsidian';
+import { App, FileSystemAdapter, Modal, normalizePath, PDFPlusLib, PdfPlusPlugin, Platform, Plugin, PluginSettingTab, Setting, TextComponent, TFile, ToggleComponent } from 'obsidian';
 
 import { around } from 'monkey-around';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { spawn } from 'child_process';
 
 import { BibtexIntegrationSettings, isHotkeysSettingTab } from 'types';
-import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, set_bookmark_resolver_script_path, set_use_native_binary, ensureBookmarkResolver, fileExists, parseFilePath } from 'utils';
+import { unwatchFile, watchFile, doesFolderExist, set_bookmark_resolver_path, set_bookmark_resolver_script_path, bookmark_resolver_script_path, set_use_native_binary, ensureBookmarkResolver, fileExists, parseFilePath } from 'utils';
 
 import { DEFAULT_BIBTEX_CONTENT, DEFAULT_SETTINGS } from 'defaults';
 import { InsertCitationFuzzyModal, InsertCitekeyFuzzyModal, OpenPdfFuzzyModal } from 'citekeyFuzzyModal';
@@ -221,6 +222,62 @@ export default class BibtexIntegration extends Plugin {
     async saveSettings() {
         await this.saveData(this.settings);
     }
+
+    showResolverNagIfNeeded() {
+        if (!this.settings.use_native_binary && !this.settings.suppress_resolver_nag) {
+            new BookmarkResolverNagModal(this.app, this).open();
+        }
+    }
+}
+
+export class BookmarkResolverNagModal extends Modal {
+    constructor(app: App, private plugin: BibtexIntegration) { super(app); }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl('h2', { text: 'Bookmark resolver notice' });
+        contentEl.createEl('p', { text:
+            'PDF bookmarks are being resolved using the AppleScript resolver, ' +
+            'which is slower than the native Swift binary. You can inspect the ' +
+            'script, switch to the faster binary, or silence this notice.' });
+
+        new Setting(contentEl)
+            .setName('Inspect the resolver script')
+            .setDesc('Open bookmark_resolver.scpt in Script Editor to review what it does.')
+            .addButton(btn => btn
+                .setButtonText('Open in Script Editor')
+                .onClick(() => {
+                    if (bookmark_resolver_script_path) spawn('open', [bookmark_resolver_script_path]);
+                    this.close();
+                }));
+
+        new Setting(contentEl)
+            .setName('Use the Swift binary')
+            .setDesc('Download and enable the faster compiled binary. You can revert in Settings.')
+            .addButton(btn => btn
+                .setButtonText('Download & use binary')
+                .setCta()
+                .onClick(async () => {
+                    this.plugin.settings.use_native_binary = true;
+                    set_use_native_binary(true);
+                    await this.plugin.saveSettings();
+                    ensureBookmarkResolver(this.plugin.manifest.version, true);
+                    this.close();
+                }));
+
+        new Setting(contentEl)
+            .setName("Don't show again")
+            .setDesc('Silence this notice. You can change the resolver in Settings at any time.')
+            .addButton(btn => btn
+                .setButtonText("Don't show again")
+                .onClick(async () => {
+                    this.plugin.settings.suppress_resolver_nag = true;
+                    await this.plugin.saveSettings();
+                    this.close();
+                }));
+    }
+
+    onClose() { this.contentEl.empty(); }
 }
 
 class BibtexIntegrationSettingTab extends PluginSettingTab {
@@ -468,6 +525,42 @@ class BibtexIntegrationSettingTab extends PluginSettingTab {
                     this.plugin.saveSettings();
                 });
         });
+
+        if (Platform.isMacOS) {
+            new Setting(containerEl).setName('Bookmark resolver').setHeading();
+
+            new Setting(containerEl)
+                .setName('Resolver script')
+                .setDesc('The AppleScript used to resolve BibDesk bookmark links. Open it in Script Editor to inspect what it does.')
+                .addButton(btn => btn
+                    .setButtonText('Open in Script Editor')
+                    .setDisabled(!bookmark_resolver_script_path)
+                    .onClick(() => {
+                        if (bookmark_resolver_script_path) spawn('open', [bookmark_resolver_script_path]);
+                    }));
+
+            new Setting(containerEl)
+                .setName('Use native Swift binary')
+                .setDesc('Enable the faster compiled Swift binary instead of AppleScript. The binary is downloaded from GitHub Releases.')
+                .addToggle(toggle => toggle
+                    .setValue(this.plugin.settings.use_native_binary)
+                    .onChange(async (value) => {
+                        this.plugin.settings.use_native_binary = value;
+                        set_use_native_binary(value);
+                        await this.plugin.saveSettings();
+                        if (value) ensureBookmarkResolver(this.plugin.manifest.version, true);
+                    }));
+
+            new Setting(containerEl)
+                .setName('Suppress performance notice')
+                .setDesc('Do not show the performance notice when resolving bookmarks via AppleScript.')
+                .addToggle(toggle => toggle
+                    .setValue(this.plugin.settings.suppress_resolver_nag)
+                    .onChange(async (value) => {
+                        this.plugin.settings.suppress_resolver_nag = value;
+                        await this.plugin.saveSettings();
+                    }));
+        }
 
         new Setting(containerEl).setName('Commands and hotkeys').setHeading();
 

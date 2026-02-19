@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: BibtexIntegrationSettings = {
     use_demo_entries: true,
     organize_by_years: true,
     use_native_binary: false,
+    suppress_resolver_nag: false,
 }
 
 export const AuthorOptionsDefault: AuthorFormatOptions = {

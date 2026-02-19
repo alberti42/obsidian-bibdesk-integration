@@ -115,6 +115,7 @@ export interface BibtexIntegrationSettings {
     use_demo_entries: boolean,     // Show demo BibTeX entries when no .bib file is configured
     organize_by_years: boolean;    // Create year-based subfolders within pdf_folder
     use_native_binary: boolean;    // false = AppleScript resolver (default), true = Swift binary
+    suppress_resolver_nag: boolean; // suppress the per-resolution AppleScript performance notice
 }
 
 /* ──────────────────────────────────────────────

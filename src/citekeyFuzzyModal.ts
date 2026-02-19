@@ -223,6 +223,7 @@ export class OpenPdfFuzzyModal extends BibEntriesFuzzyModal {
                 folder_path = this.plugin.settings.pdf_folder;
             }
 
+            this.plugin.showResolverNagIfNeeded();
             openBdskDocument(
                 this.app,
                 folder_path,
@@ -401,7 +402,7 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
 
     onChooseItem(selectedItem: ParsedPathWithIndex, evt: MouseEvent | KeyboardEvent): void {
         const shouldCreateNewLeaf = evt.altKey;
-        
+
         let folder_path;
         if(this.plugin.settings.organize_by_years) {
             folder_path = joinPaths(this.plugin.settings.pdf_folder,this.bibEntry.fields.year ?? "unknown");
@@ -409,6 +410,7 @@ export class PdfFileFuzzyModal extends FuzzySuggestModal<ParsedPathWithIndex> {
             folder_path = this.plugin.settings.pdf_folder;
         }
 
+        this.plugin.showResolverNagIfNeeded();
         openBdskDocument(
             this.app,
             folder_path,
