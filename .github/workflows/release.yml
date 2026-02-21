@@ -44,6 +44,19 @@ jobs:
       - name: Build bookmark resolver
         run: npm run bookmark_resolver
 
+      - name: Notarize bookmark resolver
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        run: |
+          ditto -c -k --keepParent dist/bookmark_resolver dist/bookmark_resolver.zip
+          xcrun notarytool submit dist/bookmark_resolver.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "9V3X7C8VCK" \
+            --wait
+          rm dist/bookmark_resolver.zip
+
       - name: Prepare release notes
         run: |
           VERSION="${GITHUB_REF_NAME}"
@@ -62,6 +75,7 @@ jobs:
         with:
           name: ${{ github.ref_name }}
           body_path: release-notes/release_${{ github.ref_name }}.md
+          draft: true
           files: |
             dist/bookmark_resolver
             dist/bookmark_resolver.scpt
