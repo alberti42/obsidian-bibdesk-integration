@@ -1,7 +1,7 @@
 use framework "Foundation"
 use scripting additions
 
-property scriptVersion : "1.2.0"
+property scriptVersion : "1.2.1"
 
 on resolveBookmarkFromBase64(base64String)
     -- Decode the Base64 string into NSData

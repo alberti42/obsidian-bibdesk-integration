@@ -1,6 +1,6 @@
 import Foundation
 
-let VERSION = "1.2.0"
+let VERSION = "1.2.1"
 
 // Helper function to resolve bookmark data and print the resolved path
 func resolveBookmark(from bookmarkData: Data) {
