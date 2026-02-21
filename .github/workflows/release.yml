@@ -75,7 +75,9 @@ jobs:
         with:
           name: ${{ github.ref_name }}
           body_path: release-notes/release_${{ github.ref_name }}.md
+          make_latest: true
           draft: true
+          prerelease: false
           files: |
             dist/bookmark_resolver
             dist/bookmark_resolver.scpt
